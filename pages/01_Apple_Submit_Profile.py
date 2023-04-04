@@ -36,7 +36,6 @@ def dist(var1, ref_profile, query_profile):
     diffs = 0
     sames = 0
     nines = 0
-#    distance = []
     total = 0
     
     for i in range(0, len(ref_profile)):
@@ -52,14 +51,6 @@ def dist(var1, ref_profile, query_profile):
 
     total = diffs + sames
    
-    # if diffs >= 1:
-    #     if diffs == total:
-    #         distance = 1
-    #     else:
-    #         distance = diffs / total
-    # elif diffs == 0:
-    #     distance = 0
-
     return diffs, sames, nines, total;
 
 
@@ -139,16 +130,12 @@ with col3:
      
 st.markdown('---')
 
-
-    
 if uploaded_file is not None:
         
     dfAppleRef = getData()
         
     st.subheader('Results')
 
-#        if st.checkbox('Check the box to see the results', key = 3):
-        # Iterate all rows using DataFrame.iterrows()
     for index, row in dfQuery.iterrows():
         sample = row['Sample']
         query_profile = row['Profile']
@@ -176,45 +163,26 @@ if uploaded_file is not None:
                 var1 = var1 + ', ' + str(sames) + ', ' + str(nines) + ', ' + str(diffs)
                 var_list.append(var1)
 
-
-#    text_to_write = '<p style="font-family:sans-serif; color:Green; font-size: 32px;">Query sample,</p>'
-   
         if len(var_list) >= 1:
-#        st.markdown(text_to_write, unsafe_allow_html=True)
-                    #st.subheader(f'Query sample: {sample}')
+
             for var in var_list:
                         #st.write(var)
                 var_split = var.split(', ')
- 
-                        # append rows to an DataFrame
-                        # s1 = pd.Series({'Query sample': sample, 'Match in Database': var_split[0], 'Number of Matching Markers': var_split[1], 'Number of 9s': var_split[2], 'Number of Differences': var_split[3]})
-                        # pd.concat([df, s1.to_frame().T], ignore_index=True)
                 
-                df = df.append({'Query_sample': sample, 'Match_in_Database': var_split[0],
-                                'Number_of_Matching_Markers': var_split[1],
-                                'Number_of_9s': var_split[2],
-                                'Number_of_Differences': var_split[3]}, ignore_index = True)
-
-#                    st.markdown('---')
-
-        else:
-                    #st.subheader(f'Query Sample: {sample}')
-                    #st.write('NO SIMILARITIES\n')
+                df.loc[len(df)] = {'Query_sample': sample, 'Match_in_Database': var_split[0],
+                                  'Number_of_Matching_Markers': var_split[1],
+                                  'Number_of_9s': var_split[2],
+                                  'Number_of_Differences': var_split[3]}
+ 
+          else:
+ 
             count_nines = query_profile.count('9')
 
-                    # append rows to an DataFrame
-#                    s1 = pd.Series({'Query sample': sample, 'Match in Database': 'NO SIMILARITIES', 'Number of Matching Markers': 'NA', 'Number of 9s': count_nines, 'Number of Differences': 'NA'})
-#                    s1 = pd.Series([sample, 'NO SIMILARITIES', 'NA', count_nines, 'NA'])
-#                    pd.concat([df, s1.to_frame().T], ignore_index=True)
-            df = df.append({'Query_sample' : sample, 'Match_in_Database' : 'NO SIMILARITIES',
-                            'Number_of_Matching_Markers': 'NA',
-                            'Number_of_9s': str(count_nines),
-                            'Number_of_Differences': 'NA'}, ignore_index = True)                    
-                    
-#                    st.markdown('---')
-
-        # st.write(df)
-
+            df.loc[len(df)] = {'Query_sample': sample, 'Match_in_Database': 'NO SIMILARITIES',
+                               'Number_of_Matching_Markers': 'NA',
+                               'Number_of_9s': str(count_nines),
+                               'Number_of_Differences': 'NA'}                 
+  
         # Remove duplicates based on the 'Query_sample' column.  This is because
         # there are still duplicates in the 'apple_lookup_table.csv' although
         # these are likely to be synonyms.  One only wants to count and plot a
@@ -223,17 +191,6 @@ if uploaded_file is not None:
         # mismatches allowed.
         
     df.drop_duplicates(subset='Query_sample', keep='last', inplace=True)
-
-    # csv = convert_df(df)
-
-    # st.download_button(
-    #     "Press to Download",
-    #     csv,
-    #     "matches_to_apple_database.csv",
-    #     "text/csv",
-    #     key='matches_to_database'
-    #     )
-
 
 # From the dataframe, 'df', created above,  count the number of occurences of
 # each of the matched varieties 
@@ -261,9 +218,7 @@ if uploaded_file is not None:
         st.write(df_final_counts)
 
     with col2:
-            
-        # st.bar_chart(df_final_counts.Number)
-    
+ 
         fig = px.pie(df_final_counts, values='Number', names='Match', title='Varieties Found')
         st.plotly_chart(fig)
 
@@ -276,18 +231,3 @@ st.download_button(
     "text/csv",
     key='matches_to_database'
     )
-
-# Pie chart, where the slices will be ordered and plotted counter-clockwise:
-# labels = 'Frogs', 'Hogs', 'Dogs', 'Logs'
-# sizes = [15, 30, 45, 10]
-# explode = (0, 0.1, 0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
-
-# fig1, ax1 = plt.subplots()
-# ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
-#         shadow=True, startangle=90)
-# ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-
-# st.pyplot(fig1)
-
-# df = px.data.gapminder().query("year == 2007").query("continent == 'Europe'")
-# df.loc[df['pop'] < 2.e6, 'country'] = 'Other countries' # Represent only large countries

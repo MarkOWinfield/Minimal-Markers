@@ -174,7 +174,7 @@ if uploaded_file is not None:
                                   'Number_of_9s': var_split[2],
                                   'Number_of_Differences': var_split[3]}
  
-          else:
+        else:
  
             count_nines = query_profile.count('9')
 
